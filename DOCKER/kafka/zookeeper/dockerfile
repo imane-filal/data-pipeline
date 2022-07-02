@@ -1,0 +1,34 @@
+FROM ubuntu:latest
+
+LABEL maintainer = "@Red_One"
+WORKDIR /root
+
+RUN apt-get update && \
+    apt-get install -y \
+    openssh-server \
+    openjdk-8-jdk \
+    wget \
+    nano \
+    openssh-server 
+
+RUN wget https://dlcdn.apache.org/zookeeper/zookeeper-3.7.0/apache-zookeeper-3.7.0-bin.tar.gz && \
+    tar -xzvf apache-zookeeper-3.7.0-bin.tar.gz && \
+    mv apache-zookeeper-3.7.0-bin /usr/local/zookeeper && \
+    rm apache-zookeeper-3.7.0-bin.tar.gz
+
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
+    ZOO_HOME=/usr/local/zookeeper
+    
+
+
+COPY config/* /tmp/ 
+
+RUN mv /tmp/start_zookeeper.sh ~/start_zookeeper.sh && \
+    mv /tmp/zoo.cfg $ZOO_HOME/conf/ && \
+    chmod +x ~/start_zookeeper.sh && \
+    mkdir -p /dataDir  && \
+    chmod 777 /dataDir
+
+CMD ["sh", "-c","/root/start_zookeeper.sh"]
+
+

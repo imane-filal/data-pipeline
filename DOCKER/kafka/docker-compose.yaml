@@ -1,0 +1,92 @@
+version: '3'
+
+services:
+  zookeeper:
+    build: ./zookeeper
+    image: zookeeper
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - 2181:2181
+      - 2888:2888
+      - 3888:3888
+    networks:
+      - kafka_cluster
+    tty: true
+    restart: always
+      
+  # kafka broker   
+  kafka:
+    build:
+        context: .
+        dockerfile: dockerfile
+    hostname: kafka
+    image: kafka
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - 9092:9092
+    networks:
+      - kafka_cluster
+    tty: true
+    restart: always
+
+    # kafka connect mongodb source
+  kafka_connect_mongo:
+    build:
+      context: .
+      dockerfile: connect.mongo.dockerfile
+    hostname: kafka-connect-mongo
+    image: kafka-connect-mongo
+    container_name: kafka-connect-mongo
+    ports:
+      - 8083:8083
+    networks:
+      - kafka_cluster
+    tty: true
+    restart: always
+
+  # kafka connect hdfs-3 sink
+  kafka_connect_hdfs:
+    build:
+      context: .
+      dockerfile: connect.hdfs.dockerfile
+    hostname: kafka-connect-hdfs
+    image: kafka-connect-hdfs
+    container_name: kafka-connect-hdfs
+    ports:
+      - 8084:8083
+    networks:
+      - kafka_cluster
+    tty: true
+    restart:  always
+    
+
+  
+  # schema registry 
+  schema_registry:
+    hostname: schema-registry
+    image : confluentinc/cp-schema-registry:6.0.1
+    container_name: schema-registry
+    ports:
+      - 8085:8081
+    networks:
+      - kafka_cluster
+    tty: true
+    depends_on:
+      - kafka
+      - zookeeper
+    restart:  always
+    environment:
+      - SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL=zookeeper:2181 
+      - SCHEMA_REGISTRY_HOST_NAME=schema-registry 
+      - SCHEMA_REGISTRY_LISTENERS=http://0.0.0.0:8081 
+      - SCHEMA_REGISTRY_DEBUG=true
+
+networks:
+  kafka_cluster:
+    external: 
+      name: hadoop_h_cluster
+
+

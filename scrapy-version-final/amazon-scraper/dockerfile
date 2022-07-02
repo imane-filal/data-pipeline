@@ -1,0 +1,33 @@
+FROM    mongo:latest
+
+LABEL   maintainer = "@Red_One"
+
+WORKDIR /root
+
+RUN     apt-get update && \
+        apt-get install -y   --no-install-recommends\
+        wget \
+        python3.8 \
+        gnupg \
+        pip \
+        curl \ 
+        nano
+
+
+RUN     mkdir -p /root/amazon
+
+COPY    amazon /root/amazon/ 
+COPY    mongod.conf.orig /tmp/
+COPY   rs-init.sh /tmp/
+
+RUN     mv /tmp/mongod.conf.orig /etc/mongod.conf.orig && \
+        mv /tmp/rs-init.sh ~/ && \
+        chmod +x rs-init.sh
+
+
+RUN     pip install Scrapy pymongo scrapy-splash
+EXPOSE 27017
+
+
+
+

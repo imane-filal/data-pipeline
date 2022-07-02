@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # scraper for amazon
+  scrapy-amazon: 
+    build: .
+    image: python-scrapy-image
+    hostname: scrapy-amazon
+    container_name: scrapy-amazon
+    ports:
+      # mongodb port
+      - 27026:27017
+    links:
+      - scrapy-secondary-amazon-1
+      - scrapy-secondary-amazon-2
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python-amazon
+    tty: true
+
+
+  # replicat 1
+  scrapy-secondary-amazon-1: 
+    image: mongo
+    hostname: scrapy-secondary-amazon-1
+    container_name: scrapy-secondary-amazon-1
+    
+    ports:
+      # mongodb port
+      - 27027:27017
+    networks:
+      - python-amazon
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    tty: true
+
+# replicat 2
+  scrapy-secondary-amazon-2: 
+    image: mongo
+    hostname: scrapy-secondary-amazon-2
+    container_name: scrapy-secondary-amazon-2
+    
+    ports:
+      # mongodb port
+      - 27028:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python-amazon
+    tty: true
+
+
+networks:
+  python-amazon: {}

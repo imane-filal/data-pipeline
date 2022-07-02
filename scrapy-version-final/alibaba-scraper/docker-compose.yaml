@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # scraper for alibaba
+  scrapy-alibaba: 
+    build: .
+    image: python-scrapy-image
+    hostname: scrapy-alibaba
+    container_name: scrapy-alibaba
+    ports:
+      # mongodb port
+      - 27021:27017
+    links:
+      - scrapy-secondary-alibaba-1
+      - scrapy-secondary-alibaba-2
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python-alibaba
+    tty: true
+
+
+  # replicat 1
+  scrapy-secondary-alibaba-1: 
+    image: mongo
+    hostname: scrapy-secondary-alibaba-1
+    container_name: scrapy-secondary-alibaba-1
+    
+    ports:
+      # mongodb port
+      - 27022:27017
+    networks:
+      - python-alibaba
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    tty: true
+
+# replicat 2
+  scrapy-secondary-alibaba-2: 
+    image: mongo
+    hostname: scrapy-secondary-alibaba-2
+    container_name: scrapy-secondary-alibaba-2
+    
+    ports:
+      # mongodb port
+      - 27023:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python-alibaba
+    tty: true
+
+
+networks:
+  python-alibaba: {}

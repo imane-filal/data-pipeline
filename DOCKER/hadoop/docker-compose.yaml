@@ -1,0 +1,143 @@
+version: '3'
+
+services:
+ 
+  # HDFS Daemons
+  # name-node
+  name-node: 
+    build: .
+      # context: .
+      # dockerfile: name-node.dockerfile
+    image: h_image_name_node
+    hostname: name-node
+    container_name: name-node
+    ports:
+      - 9870:9870
+      - 8088:8088
+      - 4040:4040
+      - 9000:9000
+      - 8888:8888
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # secondary-name-node
+  secondary-name-node:
+    build: ../hadoop
+    image: h_image
+    hostname: secondary-name-node
+    container_name: secondary-name-node
+    ports:
+      - 9868:9868
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-1
+  data-node-1:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-1
+    container_name: data-node-1
+    ports:
+      - 10050:9864
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-2
+  data-node-2:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-2
+    container_name: data-node-2
+    ports:
+      - 10051:9864
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-3
+  data-node-3:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-3
+    ports:
+      - 10052:9864
+    container_name: data-node-3
+   
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-4
+  data-node-4:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-4
+    container_name: data-node-4
+    ports:
+      - 10053:9864
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-5
+  data-node-5:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-5
+    container_name: data-node-5
+    ports:
+      - 10054:9864
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # data-node-6
+  data-node-6:
+    build: ../hadoop
+    image: h_image
+    hostname: data-node-6
+    container_name: data-node-6
+    ports:
+      - 10055:9864
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # YARN daemons
+  #  resource-manager
+  resource-manager:
+    build: ../hadoop
+    image: h_image
+    hostname: resource-manager
+    container_name: resource-manager
+    # ports:
+      # - 8088:8088
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+  # web-app-proxy
+  web-app-proxy:
+    build: ../hadoop
+    image: h_image
+    hostname: web-app-proxy
+    container_name: web-app-proxy
+    networks:
+      - h_cluster
+    tty: true
+    restart: always
+
+networks:
+  h_cluster: {}

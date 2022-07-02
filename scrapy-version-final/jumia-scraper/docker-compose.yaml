@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+  # scraper for jumia
+  scrapy-jumia: 
+    build: .
+    image: python-scrapy-image
+    hostname: scrapy-jumia
+    container_name: scrapy-jumia
+    ports:
+      # mongodb port
+      - 27018:27017
+    links:
+      - scrapy-secondary-jumia-1
+      - scrapy-secondary-jumia-2
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python
+    tty: true
+
+
+  # replicat 1
+  scrapy-secondary-jumia-1: 
+    image: mongo
+    hostname: scrapy-secondary-jumia-1
+    container_name: scrapy-secondary-jumia-1
+    
+    ports:
+      # mongodb port
+      - 27019:27017
+    networks:
+      - python
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    tty: true
+
+# replicat 2
+  scrapy-secondary-jumia-2: 
+    image: mongo
+    hostname: scrapy-secondary-jumia-2
+    container_name: scrapy-secondary-jumia-2
+    
+    ports:
+      # mongodb port
+      - 27020:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "dbrs" ]
+    networks:
+      - python
+    tty: true
+
+
+networks:
+  python: {}
